@@ -2,6 +2,7 @@ module PlotAxes
 using AxisArrays
 using DataFrames
 using Unitful
+using Requires
 
 export asplotable, quantize, bin, quantstep
 
@@ -14,8 +15,7 @@ bin(i,step) = floor(Int,(i-1)/step)+1
 bin(ii::CartesianIndex,steps) = CartesianIndex(bin.(ii.I,steps))
 # unbin(i,step) = (i-1)*step + 1, i*step
 
-function quantize(x,qsize)
-  steps = size(x) ./ qsize
+function quantize(x,steps)
   qsize = bin.(size(x),steps)
   values = fill(zero(float(eltype(x))),qsize)
   # TODO: computation of n could be optimized
@@ -31,7 +31,7 @@ function quantize(x,qsize)
 end
 
 axis_hasname(axis::Axis{Name},name) where Name = Name == name
-function axis_forname(axes,name) 
+function axis_forname(axes,name)
   pos = findfirst(x -> axis_hasname(x,name),axes)
   if pos isa Nothing
     error("No axis with name $name")
@@ -41,10 +41,11 @@ function axis_forname(axes,name)
 end
 
 function asplotable(x::AxisArray,ax1,axes...;quantize_size=default_quantize(x),
-                    return_size=false)
-  vals = quantize(x,quantize_size)
+                    return_steps=false)
+  steps = size(x) ./ quantize_size
+  vals = quantize(x,steps)
   axvals = axisvalues(axis_forname.(Ref(AxisArrays.axes(x)),(ax1,axes...))...)
-  axqvals = quantize.(map(x -> ustrip.(x),axvals),quantize_size)
+  axqvals = quantize.(map(x -> ustrip.(x),axvals),steps)
 
   df = DataFrame(value = vec(vals))
   for (i,ax) in enumerate((ax1,axes...))
@@ -54,8 +55,8 @@ function asplotable(x::AxisArray,ax1,axes...;quantize_size=default_quantize(x),
     end
   end
 
-  if return_size
-    df, size(vals)
+  if return_steps
+    df, map(axv -> axv[2] - axv[1],axqvals)
   else
     df
   end
@@ -68,17 +69,8 @@ function __init__()
     ggplot_axes(axis::AbstractArray) = error("Not implemented.")
   end
   @require VegaLite="112f6efa-9a02-5b7d-90c0-432ed331239a" begin
-    using .VegaLite
-    vlplot_axes(x::AxisArray;kwds) = vlplot_axes(x,axisnames(x)...;kwds...)
-    function vlplot_axes(data::AxisArray,x,y;kwds...)
-      df,qsize = asplotable(data,x,y;return_size=true,kwds...)
-      df |>
-        @vlplot(:rect, width=300, height=300, 
-                x={field=x,typ="quantitative", bin={maxbins=qsize[1]}},
-                y={field=y,typ="quantitative", bin={maxbins=qsize[2]}},
-                color={field=:value, aggregate="mean", typ="quantitative"})
-    end
-    # TODO: add 1, 3 and 4 dimensional plots
+    include("vegalite.jl")
+    @eval using VegaPlotAxes
   end
 end
 
