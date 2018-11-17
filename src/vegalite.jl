@@ -19,8 +19,7 @@ function vlplot_axes_(df,axes,x;colors,width,height)
     @vlplot(:line, width=width, height=height,
             x={field=x,typ="quantitative", bin={step=axes[1].step},
                scale={typ=asvlplot_scale(axes[1].scale)}},
-            y={field=:value,typ="quantitative",
-               scale={typ=asvlplot_scale(axes[2].scale)}})
+            y={field=:value,typ="quantitative"})
 end
 
 function vlplot_axes_(df,axes,x,y;colors,width,height)
