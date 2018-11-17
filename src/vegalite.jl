@@ -1,16 +1,70 @@
-module VegaPlotAxes
+export vlplot_axes
 
-using .VegaLite
-vlplot_axes(x::AxisArray;kwds) = vlplot_axes(x,axisnames(x)...;kwds...)
-function vlplot_axes(data::AxisArray,x,y;kwds...)
-    df,qsize = asplotable(data,x,y;return_size=true,kwds...)
-    df |>
-      @vlplot(:rect, width=300, height=300,
-              x={field=x,typ="ordingal"},
-              y={field=y,typ="ordingal"},
-              color={field=:value, aggregate="mean", typ="quantitative"})
+function asvlplot_scale(scale)
+  if scale in [:linear,:log,:sqrt,:time,:utc,:sequential]
+    string(scale)
+  else
+    error("Unsupported scale type $scale")
+  end
 end
 
-# TODO: add 1, 3 and 4 dimensional plots
+function vlplot_axes(data,args...;colors="reds",width=300,height=300,kwds...)
+  df, axes = asplotable(data,args...;kwds...)
+  vlplot_axes_(df,axes,names(df)[2:end]...;colors=colors,
+               width=width,height=height)
+end
 
-end # module
+function vlplot_axes_(df,axes,x;colors,width,height)
+  df |>
+    @vlplot(:line, width=width, height=height,
+            x={field=x,typ="quantitative", bin={step=axes[1].step},
+               scale={typ=asvlplot_scale(axes[1].scale)}},
+            y={field=:value,typ="quantitative",
+               scale={typ=asvlplot_scale(axes[2].scale)}})
+end
+
+function vlplot_axes_(df,axes,x,y;colors,width,height)
+  df |>
+  @vlplot(:rect, width=width, height=height,
+          x={field=x,typ="quantitative", bin={step=axes[1].step},
+             scale={typ=asvlplot_scale(axes[1].scale)}},
+          y={field=y,typ="quantitative", bin={step=axes[2].step},
+             scale={typ=asvlplot_scale(axes[2].scale)}},
+          color={field=:value, aggregate="mean", typ="quantitative"},
+          config={view={stroke="transparent"},
+                  scale={bandPaddingInner=0, bandPaddingOuter=0},
+                  range={heatmap={scheme=colors}}})
+end
+
+function vlplot_axes_(df,axes,x,y,z;colors,width,height)
+  df |>
+    @vlplot(:rect, width=width, height=height,
+            x={field=x,typ="quantitative", bin={step=axes[1].step},
+               scale={typ=asvlplot_scale(axes[1].scale)}},
+            y={field=y,typ="quantitative", bin={step=axes[2].step},
+               scale={typ=asvlplot_scale(axes[2].scale)}},
+            color={field=:value, aggregate="mean", typ="quantitative"},
+            column={field=z},
+            config={view={stroke="transparent"},
+                    scale={bandPaddingInner=0, bandPaddingOuter=0},
+                    range={heatmap={scheme=colors}}})
+end
+
+function vlplot_axes_(df,axes,x,y,z,w;colors,width,height)
+  df |>
+    @vlplot(:rect, width=width, height=height,
+            x={field=x,typ="quantitative", bin={step=axes[1].step},
+               scale={typ=asvlplot_scale(axes[1].scale)}},
+            y={field=y,typ="quantitative", bin={step=axes[2].step},
+               scale={typ=asvlplot_scale(axes[2].scale)}},
+            color={field=:value, aggregate="mean", typ="quantitative"},
+            column={field=z},row={field=w},
+            config={view={stroke="transparent"},
+                    scale={bandPaddingInner=0, bandPaddingOuter=0},
+                    range={heatmap={scheme=colors}}})
+end
+
+function vlplot_axes_(df,axes,args...;kwds...)
+  error("Plotting data with $(length(axes)) dims along
+        $(length(args)) axes is not supported.")
+end

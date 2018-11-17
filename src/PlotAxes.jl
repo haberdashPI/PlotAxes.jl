@@ -4,13 +4,19 @@ using DataFrames
 using Unitful
 using Requires
 
-export asplotable, quantize, bin, quantstep
+export asplotable, quantize, bin, quantstep, PlotAxis
 
+mutable struct PlotAxis
+  step::Float64
+  scale::Symbol
+end
+
+asplotable(x::AbstractArray;kwds...) = asplotable(AxisArray(x);kwds...)
 asplotable(x::AxisArray;kwds...) = asplotable(x,axisnames(x)...;kwds...)
 default_quantize(x::AbstractArray) = default_quantize(size(x))
-default_quantize(x::NTuple{1,Int}) = (100,)
-default_quantize(x::NTuple{2,Int}) = (100,100,)
-default_quantize(x::NTuple{N,Int}) where N = (100,100,fill(10,N-2)...)
+default_quantize(x::NTuple{1,Int}) = min.(x,(100,))
+default_quantize(x::NTuple{2,Int}) = min.(x,(100,100,))
+default_quantize(x::NTuple{N,Int}) where N = min.(x,(100,100,fill(10,N-2)...))
 bin(i,step) = floor(Int,(i-1)/step)+1
 bin(ii::CartesianIndex,steps) = CartesianIndex(bin.(ii.I,steps))
 # unbin(i,step) = (i-1)*step + 1, i*step
@@ -40,8 +46,9 @@ function axis_forname(axes,name)
   end
 end
 
-function asplotable(x::AxisArray,ax1,axes...;quantize_size=default_quantize(x),
-                    return_steps=false)
+# TODO: I need to use min on the quantize size no in the default quantile
+# function but inside `asplotable` so that user specified quantization works
+function asplotable(x::AxisArray,ax1,axes...;quantize_size=default_quantize(x))
   steps = size(x) ./ quantize_size
   vals = quantize(x,steps)
   axvals = axisvalues(axis_forname.(Ref(AxisArrays.axes(x)),(ax1,axes...))...)
@@ -55,11 +62,7 @@ function asplotable(x::AxisArray,ax1,axes...;quantize_size=default_quantize(x),
     end
   end
 
-  if return_steps
-    df, map(axv -> axv[2] - axv[1],axqvals)
-  else
-    df
-  end
+  df, map(axv -> PlotAxis(axv[2] - axv[1],:linear),axqvals)
 end
 
 function __init__()
@@ -69,8 +72,8 @@ function __init__()
     ggplot_axes(axis::AbstractArray) = error("Not implemented.")
   end
   @require VegaLite="112f6efa-9a02-5b7d-90c0-432ed331239a" begin
+    using .VegaLite
     include("vegalite.jl")
-    @eval using VegaPlotAxes
   end
 end
 
