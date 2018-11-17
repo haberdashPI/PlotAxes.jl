@@ -14,9 +14,9 @@ end
 asplotable(x::AbstractArray;kwds...) = asplotable(AxisArray(x);kwds...)
 asplotable(x::AxisArray;kwds...) = asplotable(x,axisnames(x)...;kwds...)
 default_quantize(x::AbstractArray) = default_quantize(size(x))
-default_quantize(x::NTuple{1,Int}) = min.(x,(100,))
-default_quantize(x::NTuple{2,Int}) = min.(x,(100,100,))
-default_quantize(x::NTuple{N,Int}) where N = min.(x,(100,100,fill(10,N-2)...))
+default_quantize(x::NTuple{1,Int}) = (100,)
+default_quantize(x::NTuple{2,Int}) = (100,100,)
+default_quantize(x::NTuple{N,Int}) where N = (100,100,fill(10,N-2)...)
 bin(i,step) = floor(Int,(i-1)/step)+1
 bin(ii::CartesianIndex,steps) = CartesianIndex(bin.(ii.I,steps))
 # unbin(i,step) = (i-1)*step + 1, i*step
@@ -49,7 +49,8 @@ end
 # TODO: I need to use min on the quantize size no in the default quantile
 # function but inside `asplotable` so that user specified quantization works
 function asplotable(x::AxisArray,ax1,axes...;quantize_size=default_quantize(x))
-  steps = size(x) ./ quantize_size
+  qs = min.(size(x),quantize_size)
+  steps = size(x) ./ qs
   vals = quantize(x,steps)
   axvals = axisvalues(axis_forname.(Ref(AxisArrays.axes(x)),(ax1,axes...))...)
   axqvals = quantize.(map(x -> ustrip.(x),axvals),steps)
