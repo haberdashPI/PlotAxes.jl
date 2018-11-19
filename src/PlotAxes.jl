@@ -46,8 +46,6 @@ function axis_forname(axes,name)
   end
 end
 
-# TODO: I need to use min on the quantize size no in the default quantile
-# function but inside `asplotable` so that user specified quantization works
 function asplotable(x::AxisArray,ax1,axes...;quantize_size=default_quantize(x))
   qs = min.(size(x),quantize_size)
   steps = size(x) ./ qs
@@ -75,6 +73,10 @@ function __init__()
   @require VegaLite="112f6efa-9a02-5b7d-90c0-432ed331239a" begin
     using .VegaLite
     include("vegalite.jl")
+  end
+  @require Gadfly="" begin
+    using .Gadfly
+    include("gadfly.jl")
   end
 end
 
