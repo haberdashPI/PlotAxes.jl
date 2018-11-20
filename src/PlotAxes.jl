@@ -74,7 +74,7 @@ function __init__()
     using .VegaLite
     include("vegalite.jl")
   end
-  @require Gadfly="" begin
+  @require Gadfly="c91e804a-d5a3-530f-b6f0-dfbca275c004" begin
     using .Gadfly
     include("gadfly.jl")
   end
