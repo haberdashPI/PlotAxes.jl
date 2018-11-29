@@ -4,12 +4,25 @@ using DataFrames
 using Unitful
 using Requires
 
-export asplotable, quantize, bin, quantstep, PlotAxis
+export asplotable, plotaxes
 
 mutable struct PlotAxis
   step::Float64
   scale::Symbol
 end
+
+const current_backend = Ref{Union{Nothing,Symbol}}(nothing)
+const available_backends = Dict{Symbol,Function}()
+function plotaxes(args...;kwds...)
+  if current_backend[] isa Nothing
+    error("No backend defined for plot axes.")
+  else
+    fn = available_backends[current_backend[]]
+    fn(args...;kwds...)
+  end
+end
+
+set_backend!(x::Symbol) = current_backend[] = x
 
 asplotable(x::AbstractArray;kwds...) = asplotable(AxisArray(x);kwds...)
 asplotable(x::AxisArray;kwds...) = asplotable(x,axisnames(x)...;kwds...)
@@ -73,10 +86,14 @@ function __init__()
   @require VegaLite="112f6efa-9a02-5b7d-90c0-432ed331239a" begin
     using .VegaLite
     include("vegalite.jl")
+    available_backends[:vegalite] = vlplot_axes
+    set_backend!(:vegalite)
   end
   @require Gadfly="c91e804a-d5a3-530f-b6f0-dfbca275c004" begin
     using .Gadfly
     include("gadfly.jl")
+    available_backends[:gadfly] = gadplot_axes
+    set_backend!(:gadfly)
   end
 end
 
