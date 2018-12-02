@@ -6,10 +6,15 @@ using Requires
 
 export asplotable, plotaxes
 
-mutable struct PlotAxis
+struct ContinuousPlotAxis
   step::Float64
   scale::Symbol
 end
+
+struct QualitativePlotAxis end
+
+PlotAxis(x::Vector{<:Number}) = ContinuousPlotAxis(x[2] - x[1],:linear)
+PlotAxis(x) = QualitativePlotAxis()
 
 const current_backend = Ref{Union{Nothing,Symbol}}(nothing)
 const available_backends = Dict{Symbol,Function}()
@@ -24,18 +29,21 @@ end
 
 set_backend!(x::Symbol) = current_backend[] = x
 
-asplotable(x::AbstractArray;kwds...) = asplotable(AxisArray(x);kwds...)
+asplotable(x::AbstractArray,args...;kwds...) =
+  asplotable(AxisArray(x),args...;kwds...)
 asplotable(x::AxisArray;kwds...) = asplotable(x,axisnames(x)...;kwds...)
-default_quantize(x::AbstractArray) = default_quantize(size(x))
-default_quantize(x::NTuple{1,Int}) = (100,)
-default_quantize(x::NTuple{2,Int}) = (100,100,)
-default_quantize(x::NTuple{N,Int}) where N = (100,100,fill(10,N-2)...)
+default_quantize(x) = (100,)
+default_quantize(x,y) = (100,100,)
+default_quantize(x,y,args...) where N = (100,100,fill(10,length(args))...)
 bin(i,step) = floor(Int,(i-1)/step)+1
 bin(ii::CartesianIndex,steps) = CartesianIndex(bin.(ii.I,steps))
 # unbin(i,step) = (i-1)*step + 1, i*step
 
 function quantize(x,steps)
   qsize = bin.(size(x),steps)
+  if all(qsize .>= size(x))
+    return x
+  end
   values = fill(zero(float(eltype(x))),qsize)
   # TODO: computation of n could be optimized
   # we're taking a "dumb" approach that is easy to understand but inefficient
@@ -59,23 +67,41 @@ function axis_forname(axes,name)
   end
 end
 
-function asplotable(x::AxisArray,ax1,axes...;quantize_size=default_quantize(x))
-  qs = min.(size(x),quantize_size)
-  steps = size(x) ./ qs
-  vals = quantize(x,steps)
-  axvals = axisvalues(axis_forname.(Ref(AxisArrays.axes(x)),(ax1,axes...))...)
-  axqvals = quantize.(map(x -> ustrip.(x),axvals),steps)
+cleanup(x::Number) = x
+cleanup(x::Quantity) = ustrip(x)
+cleanup(x) = string(x)
+default(::Type{T}) where T<:Number = zero(T)
+default(x) = ""
 
-  df = DataFrame(value = vec(vals))
-  for (i,ax) in enumerate((ax1,axes...))
-    df[:,ax] = NaN
-    for (j,jj) in enumerate(CartesianIndices(vals))
-      df[j,ax] = axqvals[i][jj.I[i]]
+function asplotable(x::AxisArray,ax1,axes...;
+                    quantize=default_quantize(ax1,axes...))
+  show_axes = (ax1,axes...)
+  qs = map(axisnames(x)) do ax
+    if ax ∈ show_axes
+      min(size(x,Axis{ax}),quantize[findfirst(isequal(ax),show_axes)])
+    else
+      1
     end
   end
 
-  df, map(axv -> PlotAxis(axv[2] - axv[1],:linear),axqvals)
+  steps = size(x) ./ qs
+  vals = PlotAxes.quantize(x,steps)
+  axqvals = PlotAxes.quantize.(map(x -> cleanup.(x),axisvalues(x)),steps)
+
+  df = DataFrame(value = vec(vals))
+  for ax in show_axes
+    axi = findfirst(isequal(ax),axisnames(x))
+    df[:,ax] = default(eltype(axqvals[axi]))
+    for (j,jj) in enumerate(CartesianIndices(vals))
+      df[j,ax] = axqvals[axi][jj.I[axi]]
+    end
+  end
+
+  df, map(axv -> PlotAxis(axv),axqvals)
 end
+
+# using Gadfly
+# include("gadfly.jl")
 
 function __init__()
   @require RCall="6f49c342-dc21-5d91-9882-a32aef131414" begin

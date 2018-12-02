@@ -10,6 +10,10 @@ end
 
 function vlplot_axes(data,args...;colors="reds",width=300,height=300,kwds...)
   df, axes = asplotable(data,args...;kwds...)
+  if any(x -> x isa QualitativePlotAxis,axes)
+    error("VegaLite interface does not yet support qualitative axes.")
+  end
+
   vlplot_axes_(df,axes,names(df)[2:end]...;colors=colors,
                width=width,height=height)
 end
