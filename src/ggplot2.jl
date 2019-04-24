@@ -1,0 +1,82 @@
+export ggplot_axes
+
+split_ggargs(args...) = (),args
+split_ggargs(ax::Symbol,args...) = (ax,),args
+split_ggargs(ax1::Symbol,ax2::Symbol,args...) = (ax1,ax2),args
+split_ggargs(ax1::Symbol,ax2::Symbol,ax3::Symbol,args...) = (ax1,ax2,ax3),args
+split_ggargs(ax1::Symbol,ax2::Symbol,ax3::Symbol,ax4::Symbol,args...) =
+  (ax1,ax2,ax3,ax4),args
+split_ggargs(ax1::Symbol,ax2::Symbol,ax3::Symbol,ax4::Symbol,ax5::Symbol,args...) =
+  (ax1,ax2,ax3,ax4,ax5),args
+split_ggargs(ax1::Symbol,ax2::Symbol,ax3::Symbol,ax4::Symbol,ax5::Symbol,
+  ax6::Symbol,args...) = (ax1,ax2,ax3,ax4,ax5,ax6),args
+function split_ggargs(ax1::Symbol,ax2::Symbol,ax3::Symbol,ax4::Symbol,
+                      ax5::Symbol,ax6::Symbol,ax7::Symbol,args...)
+  error("Plotting data using 7 or more axes is not supported by ggplot backend.")
+end
+
+function ggplot_axes(data,args...;kwds...)
+  ax, args = split_ggargs(args...)
+  df, axes = asplotable(data,ax...;kwds...)
+  if eltype(df.value) <: Complex
+    df.value = abs.(df.value)
+    @warn("Ignoring phase of complex value")
+  end
+
+  ggplot_axes_(df,axes,names(df)[2:end]...;args=args)
+end
+
+function ggplot_axes_(df,axes,x;args)
+  plot(df,x=x,y=:value,Geom.line,args...)
+end
+
+function ggplot_axes_(df,axes,x,y;args)
+  R"""
+  require(ggplot2)
+  ggplot($df,aes_string(x=$(string(x)),$(string(y)))) +
+      geom_raster(aes(fill=value))
+  """
+end
+
+function ggplot_axes_(df,axes,x,y,z;args)
+  R"""
+  require(ggplot2)
+  ggplot($df,aes_string(x=$(string(x)),$(string(y)))) +
+      geom_raster(aes(fill=value)) +
+      facet_wrap(as.formula(paste("~", $(string(z)))))
+  """
+end
+
+function ggplot_axes_(df,axes,x,y,z,w;args)
+  R"""
+  require(ggplot2)
+  ggplot($df,aes_string(x=$(string(x)),$(string(y)))) +
+      geom_raster(aes(fill=value)) +
+      facet_grid(as.formula(paste($(string(w)), "~", $(string(z)))))
+  """
+end
+
+function ggplot_axes_(df,axes,x,y,z,w,v;args)
+  R"""
+  require(ggplot2)
+  ggplot($df,aes_string(x=$(string(x)),$(string(y)))) +
+      geom_raster(aes(fill=value)) +
+      facet_grid(as.formula(paste($(string(w)), "~",
+        $(string(z)), "+", $(string(v)))))
+  """
+end
+
+function ggplot_axes_(df,axes,x,y,z,w,v,u;args)
+  R"""
+  require(ggplot2)
+  ggplot($df,aes_string(x=$(string(x)),$(string(y)))) +
+      geom_raster(aes(fill=value)) +
+      facet_grid(as.formula(paste($(string(w)), "+", $(string(u)), "~",
+        $(string(z)), "+", $(string(v)))))
+  """
+end
+
+function ggplot_axes_(df,axes,args...;kwds...)
+  error("Plotting data with $(length(axes)) dims along
+        $(length(args)) axes is not supported.")
+end

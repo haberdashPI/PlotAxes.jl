@@ -1,18 +1,18 @@
 export gadplot_axes
 
-split_axargs(args...) = (),args
-split_axargs(ax::Symbol,args...) = (ax,),args
-split_axargs(ax1::Symbol,ax2::Symbol,args...) = (ax1,ax2),args
-split_axargs(ax1::Symbol,ax2::Symbol,ax3::Symbol,args...) = (ax1,ax2,ax3),args
-split_axargs(ax1::Symbol,ax2::Symbol,ax3::Symbol,ax4::Symbol,args...) =
+split_gadargs(args...) = (),args
+split_gadargs(ax::Symbol,args...) = (ax,),args
+split_gadargs(ax1::Symbol,ax2::Symbol,args...) = (ax1,ax2),args
+split_gadargs(ax1::Symbol,ax2::Symbol,ax3::Symbol,args...) = (ax1,ax2,ax3),args
+split_gadargs(ax1::Symbol,ax2::Symbol,ax3::Symbol,ax4::Symbol,args...) =
   (ax1,ax2,ax3,ax4),args
-function split_axargs(ax1::Symbol,ax2::Symbol,ax3::Symbol,ax4::Symbol,
+function split_gadargs(ax1::Symbol,ax2::Symbol,ax3::Symbol,ax4::Symbol,
                       ax5::Symbol,args...)
-  error("Plotting data using 5 or more axes is not supported.")
+  error("Plotting data using 5 or more axes is not supported by Gadfly backend.")
 end
 
 function gadplot_axes(data,args...;kwds...)
-  ax, args = split_axargs(args...)
+  ax, args = split_gadargs(args...)
   df, axes = asplotable(data,ax...;kwds...)
   if eltype(df.value) <: Complex
     df.value = abs.(df.value)
