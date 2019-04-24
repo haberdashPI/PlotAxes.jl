@@ -25,7 +25,7 @@ A quick and rudimentary display of large arrays of medium dimensionality (up
 to about 5 dimensions, depending on the backend). You can determine how the
 plot is displayed using `PlotAxes.set_backend`.
 
-The data should be a matrix with from 1 and up to about 6 dimensions (how
+The data should be an array between 1 and up to about 6 dimensions (how
 high you can go depends on the backend). By default all axes are plotted, but
 you can use the names of the axes (defined by `AxisArray(data)`) to look
 at the data averaged across the unlisted dimensions.
@@ -100,7 +100,7 @@ end
 axis_hasname(axis::Axis{Name},name) where Name = Name == name
 function axis_forname(axes,name)
   pos = findfirst(x -> axis_hasname(x,name),axes)
-  if pos isa Nothing
+  if isnothing(pos)
     error("No axis with name $name")
   else
     axes[pos]
