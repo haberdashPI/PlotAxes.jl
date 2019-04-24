@@ -1,7 +1,6 @@
 module PlotAxes
 using AxisArrays
 using DataFrames
-using Unitful
 using Requires
 
 export asplotable, plotaxes
@@ -18,16 +17,57 @@ PlotAxis(x) = QualitativePlotAxis()
 
 const current_backend = Ref{Union{Nothing,Symbol}}(nothing)
 const available_backends = Dict{Symbol,Function}()
+
+"""
+    plotaxes(data,[axis1,axis2,etc...];quantize=(100,100,10,10,...))
+
+A quick and rudimentary display of large arrays of medium dimensionality (up
+to about 5 dimensions, depending on the backend). You can determine how the
+plot is displayed using `PlotAxes.set_backend`.
+
+The data should be a matrix with from 1 and up to about 6 dimensions (how
+high you can go depends on the backend). By default all axes are plotted, but
+you can use the names of the axes (defined by `AxisArray(data)`) to look
+at the data averaged across the unlisted dimensions.
+
+The data are quantized by default to maintain reasonable performance. You can
+change the amount of quantization, specifying the maximum number of bins per
+axis. The order is the same as the arguments passed, which defaults to the
+natural order of the dimensinos (rows, cols, etc...).
+
+"""
 function plotaxes(args...;kwds...)
   if current_backend[] isa Nothing
-    error("No backend defined for plot axes.")
+    error("No backend defined for plot axes. Call `PlotAxes.set_backend`")
   else
     fn = available_backends[current_backend[]]
     fn(args...;kwds...)
   end
 end
 
+"""
+    set_backend(symbol)
+
+Set the backend used to display plots when calling `plotaxes`. Call
+`list_backends()` for a list of available backends.
+"""
 set_backend!(x::Symbol) = current_backend[] = x
+
+"""
+    list_backends()
+
+List all currently available backends for plotting with `plotaxes`.
+This will be populated as packages that are supported by `PlotAxes` are loaded.
+
+# Supported backends
+
+- Gadfly
+- VegaLite
+- RCall (via ggplot2)
+- Makie
+
+"""
+list_backends() = keys(available_backends)
 
 asplotable(x::AbstractArray,args...;kwds...) =
   asplotable(AxisArray(x),args...;kwds...)
@@ -68,7 +108,6 @@ function axis_forname(axes,name)
 end
 
 cleanup(x::Number) = x
-cleanup(x::Quantity) = ustrip(x)
 cleanup(x) = string(x)
 default(::Type{T}) where T<:Number = zero(T)
 default(x) = ""
@@ -106,8 +145,13 @@ end
 function __init__()
   @require RCall="6f49c342-dc21-5d91-9882-a32aef131414" begin
     using .RCall
-
-    ggplot_axes(axis::AbstractArray) = error("Not implemented.")
+    include("ggplot2.jl")
+    available_backends[:ggplot2] = ggplot_axes
+    set_backend!(:ggplot2)
+  end
+  @require Unitful="1986cc42-f94f-5a68-af5c-568840ba703d" begin
+    using .Unitful
+    cleanup(x::Quantity) = ustrip(x)
   end
   @require VegaLite="112f6efa-9a02-5b7d-90c0-432ed331239a" begin
     using .VegaLite

@@ -1,3 +1,5 @@
+# This file is machine-generated - editing it directly is not advised
+
 [[AxisArrays]]
 deps = ["Compat", "Dates", "IntervalSets", "IterTools", "Random", "RangeArrays", "Test"]
 git-tree-sha1 = "2e2536e9e6f27c4f8d09d8442b61a7ae0b910c28"
@@ -214,12 +216,6 @@ uuid = "cf7118a7-6976-5b1a-9a39-7adc72f591a4"
 
 [[Unicode]]
 uuid = "4ec0a83e-493e-50e2-b9ac-8f72acf5a8f5"
-
-[[Unitful]]
-deps = ["LinearAlgebra", "Random", "Test"]
-git-tree-sha1 = "cef7da6d4e9735fae7c11cd28e77b76fd87db468"
-uuid = "1986cc42-f94f-5a68-af5c-568840ba703d"
-version = "0.12.0"
 
 [[WeakRefStrings]]
 deps = ["Missings", "Random", "Test"]
