@@ -1,34 +1,26 @@
 # PlotAxes
 
-An interface to plot an `AbstractArray` or
-[`AxisArray`](https://github.com/JuliaArrays/AxisArrays.jl) for quickly
-plotting data using a grammar-of-graphics approach. You can use
-[`Gadfly`](http://gadflyjl.org/stable/) or
-[`VegaLite.jl`](https://github.com/fredo-dedup/VegaLite.jl) to plot them.
+PlotAxes is intended to simplify the visualization of medium dimensional data
+(e.g. 4-5 dimensions max) during an interactive session. (It is *not*
+intended as a full fledged plotting API for publication quality graphs.)
 
-PlotAxes is mostly not intended for publication quality plots, but rather
-reduces the time to generate a quick and dirty plot of medium dimensional
-data (e.g. 4-5 dimensions at most) during exploratory analyses.
+It can be used to plot an `AbstractArray` or
+[`AxisArray`](https://github.com/JuliaArrays/AxisArrays.jl). Supported
+backends are described in the documentation of `PlotAxes.list_backends`. With
+an `AxisArray` the axes will be properly labeled.
 
-To use it, just call `plotaxes` as follows.
+To use it, just call `plotaxes`, as follows.
 
 ```julia
 using PlotAxes
-using Gadfly
+using Gadfly # replace with VegaLite or RCall as desired
 
-plotaxes(rand(10,10,4,4))
+plotaxes(AxisArray(rand(10,10,4,2),:time,:freq,:age,:gender))
 ```
+
+For more details seeing the documentation for `plotaxes` (ala ? at the REPL).
 
 ## Status
 
-This is a relatively incomplete package at this point. It works for my needs,
-in the few cases I have tested, but there is still some work to do to make
-this accessible and easy to use. Right now, your best bet for understanding
-how to use all the features of this package is to read all of the code:
-there's not very much of it.
-
-## TODO
-
-* Improve documentation.
-* Implement `ggplot` plots using `RCall`.
-* Improve the flexibility of the interface.
+This is working for display of data in my day-to-day work. There are plenty
+of features that might be added or backends that could be implemented.

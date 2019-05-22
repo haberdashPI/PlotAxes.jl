@@ -22,7 +22,7 @@ const available_backends = Dict{Symbol,Function}()
     plotaxes(data,[axis1,axis2,etc...];quantize=(100,100,10,10,...))
 
 A quick and rudimentary display of large arrays of medium dimensionality (up
-to about 5 dimensions, depending on the backend). You can determine how the
+to about 5 dimensions, depending on the backend). You can change how the
 plot is displayed using `PlotAxes.set_backend`.
 
 The data should be an array between 1 and up to about 6 dimensions (how high
@@ -34,12 +34,13 @@ dimensions.
 A single axis is plotted as a line. Multiple axes are plotted as a heatmap.
 The first two axes specified are the x and y axes of this heatmap. The
 remaining axes are plotted along rows and columns of a grid of plots; some
-backends allow a row or column to represent multiple dimensions.
+backends allow a row or column to represent multiple dimensions (e.g. ggplot).
 
 The data are quantized by default to maintain reasonable performance. You can
 change the amount of quantization, specifying the maximum number of bins per
-axis. The order is the same as the arguments passed, which defaults to the
-natural order of the dimensinos (rows, cols, etc...).
+axis as a tuple. The order of a quantizatio tuple is the same as the
+axis arguments passed, which defaults to the natural order of the dimensinos
+(rows, cols, etc...).
 
 """
 function plotaxes(args...;kwds...)
@@ -62,8 +63,9 @@ set_backend!(x::Symbol) = current_backend[] = x
 """
     list_backends()
 
-List all currently available backends for plotting with `plotaxes`.
-This will be populated as packages that are supported by `PlotAxes` and are loaded.
+List all currently available backends for plotting with `plotaxes`. This will
+be populated as packages that are supported by `PlotAxes` are loaded (e.g.
+via `using`)
 
 # Supported backends
 
