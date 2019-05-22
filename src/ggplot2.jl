@@ -27,7 +27,10 @@ function ggplot_axes(data,args...;kwds...)
 end
 
 function ggplot_axes_(df,axes,x;args)
-  plot(df,x=x,y=:value,Geom.line,args...)
+  R"""
+  require(ggplot2)
+  ggplot($df,aes_string(x=$(string(x)),y="value")) + geom_line()
+  """
 end
 
 function ggplot_axes_(df,axes,x,y;args)
@@ -43,7 +46,8 @@ function ggplot_axes_(df,axes,x,y,z;args)
   require(ggplot2)
   ggplot($df,aes_string(x=$(string(x)),$(string(y)))) +
       geom_raster(aes(fill=value)) +
-      facet_wrap(as.formula(paste("~", $(string(z)))))
+      facet_wrap(as.formula(paste("~", $(string(z)))),
+        labeller="label_both")
   """
 end
 
@@ -52,7 +56,8 @@ function ggplot_axes_(df,axes,x,y,z,w;args)
   require(ggplot2)
   ggplot($df,aes_string(x=$(string(x)),$(string(y)))) +
       geom_raster(aes(fill=value)) +
-      facet_grid(as.formula(paste($(string(w)), "~", $(string(z)))))
+      facet_grid(as.formula(paste($(string(w)), "~",
+        $(string(z)))),labeller="label_both")
   """
 end
 
@@ -62,7 +67,7 @@ function ggplot_axes_(df,axes,x,y,z,w,v;args)
   ggplot($df,aes_string(x=$(string(x)),$(string(y)))) +
       geom_raster(aes(fill=value)) +
       facet_grid(as.formula(paste($(string(w)), "~",
-        $(string(z)), "+", $(string(v)))))
+        $(string(z)), "+", $(string(v)))),labeller="label_both")
   """
 end
 
@@ -72,7 +77,7 @@ function ggplot_axes_(df,axes,x,y,z,w,v,u;args)
   ggplot($df,aes_string(x=$(string(x)),$(string(y)))) +
       geom_raster(aes(fill=value)) +
       facet_grid(as.formula(paste($(string(w)), "+", $(string(u)), "~",
-        $(string(z)), "+", $(string(v)))))
+        $(string(z)), "+", $(string(v)))),labeller="label_both")
   """
 end
 
