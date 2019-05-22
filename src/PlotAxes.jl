@@ -25,10 +25,16 @@ A quick and rudimentary display of large arrays of medium dimensionality (up
 to about 5 dimensions, depending on the backend). You can determine how the
 plot is displayed using `PlotAxes.set_backend`.
 
-The data should be an array between 1 and up to about 6 dimensions (how
-high you can go depends on the backend). By default all axes are plotted, but
-you can use the names of the axes (defined by `AxisArray(data)`) to look
-at the data averaged across the unlisted dimensions.
+The data should be an array between 1 and up to about 6 dimensions (how high
+you can go depends on the backend). By default all axes are plotted, but you
+can explicitly specifiy the names of the axes (as defined by
+`AxisArray(data)`) to look at the data averaged across the unlisted
+dimensions.
+
+A single axis is plotted as a line. Multiple axes are plotted as a heatmap.
+The first two axes specified are the x and y axes of this heatmap. The
+remaining axes are plotted along rows and columns of a grid of plots; some
+backends allow a row or column to represent multiple dimensions.
 
 The data are quantized by default to maintain reasonable performance. You can
 change the amount of quantization, specifying the maximum number of bins per
@@ -57,14 +63,13 @@ set_backend!(x::Symbol) = current_backend[] = x
     list_backends()
 
 List all currently available backends for plotting with `plotaxes`.
-This will be populated as packages that are supported by `PlotAxes` are loaded.
+This will be populated as packages that are supported by `PlotAxes` and are loaded.
 
 # Supported backends
 
 - Gadfly
 - VegaLite
 - RCall (via ggplot2)
-- Makie
 
 """
 list_backends() = keys(available_backends)
@@ -136,7 +141,8 @@ function asplotable(x::AxisArray,ax1,axes...;
     end
   end
 
-  df, map(axv -> PlotAxis(axv),axqvals)
+  df, map(axv -> PlotAxis(axv),
+    map(ax -> axqvals[findfirst(isequal(ax),axisnames(x))],show_axes))
 end
 
 # using Gadfly
