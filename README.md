@@ -1,8 +1,8 @@
 # PlotAxes
 
 PlotAxes is intended to simplify the visualization of medium dimensional data
-(e.g. 4-5 dimensions max) during an interactive session. (It is *not*
-intended as a full fledged plotting API for publication quality graphs.)
+(e.g. 4-5 dimensions max) during an interactive session. It is *not*
+intended as a full fledged plotting API for publication quality graphs.
 
 It can be used to plot an `AbstractArray` or
 [`AxisArray`](https://github.com/JuliaArrays/AxisArrays.jl). Supported
@@ -12,8 +12,7 @@ an `AxisArray` the axes will be properly labeled.
 To use it, just call `plotaxes`, as follows.
 
 ```julia
-using PlotAxes
-using Gadfly # replace with VegaLite or RCall as desired
+using PlotAxes, AxisArrays, Gadfly # replace Gadfly with VegaLite or RCall as desired
 
 plotaxes(AxisArray(rand(10,10,4,2),:time,:freq,:age,:gender))
 ```
