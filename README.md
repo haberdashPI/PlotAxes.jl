@@ -18,7 +18,7 @@ using Gadfly # replace with VegaLite or RCall as desired
 plotaxes(AxisArray(rand(10,10,4,2),:time,:freq,:age,:gender))
 ```
 
-For more details seeing the documentation for `plotaxes` (ala ? at the REPL).
+For more details, see the documentation for `plotaxes` (ala ? at the REPL).
 
 ## Status
 
