@@ -153,6 +153,7 @@ end
 function __init__()
   @require RCall="6f49c342-dc21-5d91-9882-a32aef131414" begin
     using .RCall
+    @info "Loading RCall ggplot2 backend for `PlotAxes`"
     include("ggplot2.jl")
     available_backends[:ggplot2] = ggplot_axes
     set_backend!(:ggplot2)
@@ -163,12 +164,14 @@ function __init__()
   end
   @require VegaLite="112f6efa-9a02-5b7d-90c0-432ed331239a" begin
     using .VegaLite
+    @info "Loading VegaLite backend for `PlotAxes`"
     include("vegalite.jl")
     available_backends[:vegalite] = vlplot_axes
     set_backend!(:vegalite)
   end
   @require Gadfly="c91e804a-d5a3-530f-b6f0-dfbca275c004" begin
     using .Gadfly
+    @info "Loading Gadfly backend for `PlotAxes`"
     include("gadfly.jl")
     available_backends[:gadfly] = gadplot_axes
     set_backend!(:gadfly)
