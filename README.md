@@ -17,6 +17,10 @@ using PlotAxes, AxisArrays, Gadfly # replace Gadfly with VegaLite or RCall as de
 plotaxes(AxisArray(rand(10,10,4,2),:time,:freq,:age,:gender))
 ```
 
+This code results in the following figure:
+
+![2x5 heat map plots of random values](example.png)
+
 For more details, see the documentation for `plotaxes` (ala ? at the REPL).
 
 ## Status
