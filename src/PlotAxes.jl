@@ -2,6 +2,8 @@ module PlotAxes
 using AxisArrays
 using DataFrames
 using Requires
+using Dates
+using Debugger
 
 export asplotable, plotaxes
 
@@ -86,12 +88,28 @@ bin(i,step) = floor(Int,(i-1)/step)+1
 bin(ii::CartesianIndex,steps) = CartesianIndex(bin.(ii.I,steps))
 # unbin(i,step) = (i-1)*step + 1, i*step
 
+cleanup(x) = x
+cleanup(x::Symbol) = string(x)
+default_value(::Type{T}) where T = zero(float(T))
+default_value(::Type{T}) where T <: TimeType = T(0)
+default_value(::Type{T}) where T <: Union{Symbol,String} = ""
+
+function quantize(x::AbstractRange{<:DateTime},steps::Number)
+  step = steps[1]
+  qsize = bin(length(x),step)
+  if qsize >= length(x)
+    return x
+  end
+
+  range(first(x),last(x),step=(last(x) - first(x))/(qsize-1))
+end
+
 function quantize(x,steps)
   qsize = bin.(size(x),steps)
   if all(qsize .>= size(x))
     return x
   end
-  values = fill(zero(float(eltype(x))),qsize)
+  values = fill(default_value(eltype(x)),qsize)
   # TODO: computation of n could be optimized
   # we're taking a "dumb" approach that is easy to understand but inefficient
   n = fill(0,qsize)
@@ -114,11 +132,6 @@ function axis_forname(axes,name)
   end
 end
 
-cleanup(x::Number) = x
-cleanup(x) = string(x)
-default(::Type{T}) where T<:Number = zero(T)
-default(x) = ""
-
 function asplotable(x::AxisArray,ax1,axes...;
                     quantize=default_quantize(ax1,axes...))
   show_axes = (ax1,axes...)
@@ -132,14 +145,14 @@ function asplotable(x::AxisArray,ax1,axes...;
 
   steps = size(x) ./ qs
   vals = PlotAxes.quantize(x,steps)
-  axqvals = PlotAxes.quantize.(map(x -> cleanup.(x),axisvalues(x)),steps)
+  axqvals = PlotAxes.quantize.(axisvalues(x),steps)
 
   df = DataFrame(value = vec(vals))
   for ax in show_axes
     axi = findfirst(isequal(ax),axisnames(x))
-    df[:,ax] = default(eltype(axqvals[axi]))
+    df[:,ax] = default_value(eltype(axqvals[axi]))
     for (j,jj) in enumerate(CartesianIndices(vals))
-      df[j,ax] = axqvals[axi][jj.I[axi]]
+      df[j,ax] = cleanup(axqvals[axi][jj.I[axi]])
     end
   end
 
