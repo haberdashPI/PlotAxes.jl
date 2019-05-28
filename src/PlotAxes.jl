@@ -6,14 +6,17 @@ using Dates
 
 export asplotable, plotaxes
 
-struct ContinuousPlotAxis
-  step::Float64
+struct ContinuousPlotAxis{N}
+  step::N
   scale::Symbol
 end
 
 struct QualitativePlotAxis end
 
 PlotAxis(x::Vector{<:Number}) = ContinuousPlotAxis(x[2] - x[1],:linear)
+PlotAxis(x::AbstractRange{<:Number}) = ContinuousPlotAxis(step(x),:linear)
+PlotAxis(x::Vector{<:TimeType}) = ContinuousPlotAxis(x[2] - x[1],:linear)
+PlotAxis(x::AbstractRange{<:TimeType}) = ContinuousPlotAxis(step(x),:linear)
 PlotAxis(x) = QualitativePlotAxis()
 
 const current_backend = Ref{Union{Nothing,Symbol}}(nothing)
