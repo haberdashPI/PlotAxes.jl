@@ -3,7 +3,6 @@ using AxisArrays
 using DataFrames
 using Requires
 using Dates
-using Debugger
 
 export asplotable, plotaxes
 
@@ -83,7 +82,7 @@ asplotable(x::AbstractArray,args...;kwds...) =
 asplotable(x::AxisArray;kwds...) = asplotable(x,axisnames(x)...;kwds...)
 default_quantize(x) = (100,)
 default_quantize(x,y) = (100,100,)
-default_quantize(x,y,args...) where N = (100,100,fill(10,length(args))...)
+default_quantize(x,y,args...) = (100,100,fill(10,length(args))...)
 bin(i,step) = floor(Int,(i-1)/step)+1
 bin(ii::CartesianIndex,steps) = CartesianIndex(bin.(ii.I,steps))
 # unbin(i,step) = (i-1)*step + 1, i*step
