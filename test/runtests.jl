@@ -34,13 +34,6 @@ using Pkg
   @test size(df,1) == 25
 end
 
-ENV["R_HOME"]="*"
-# the latest Conda master simplifies the specification of conda channels
-pkg"add Gadfly VegaLite RCall Conda#fb9a112921656b9d38fbc92ef7dae540f1ba182b"
-pkg"build RCall"
-using Conda
-Conda.add("r-ggplot2",channel="r")
-
 @testset "Can use backends" begin
   data = AxisArray(rand(10,10,2,2),:a,:b,:c,:d)
 
