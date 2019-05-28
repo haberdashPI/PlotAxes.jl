@@ -28,14 +28,14 @@ end
 
 function ggplot_axes_(df,axes,x;args)
   R"""
-  require(ggplot2)
+  library(ggplot2)
   ggplot($df,aes_string(x=$(string(x)),y="value")) + geom_line()
   """
 end
 
 function ggplot_axes_(df,axes,x,y;args)
   R"""
-  require(ggplot2)
+  library(ggplot2)
   ggplot($df,aes_string(x=$(string(x)),$(string(y)))) +
       geom_raster(aes(fill=value))
   """
@@ -43,7 +43,7 @@ end
 
 function ggplot_axes_(df,axes,x,y,z;args)
   R"""
-  require(ggplot2)
+  library(ggplot2)
   ggplot($df,aes_string(x=$(string(x)),$(string(y)))) +
       geom_raster(aes(fill=value)) +
       facet_wrap(as.formula(paste("~", $(string(z)))),
