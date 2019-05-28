@@ -34,7 +34,9 @@ using Pkg
   @test size(df,1) == 25
 end
 
+ENV["R_HOME"]="*"
 pkg"add Gadfly VegaLite RCall"
+
 @testset "Can use backends" begin
   data = AxisArray(rand(10,10,2,2),:a,:b,:c,:d)
 
