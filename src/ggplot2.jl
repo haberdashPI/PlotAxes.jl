@@ -53,7 +53,7 @@ end
 
 function ggplot_axes_(df,axes,x,y,z,w;args)
   R"""
-  require(ggplot2)
+  library(ggplot2)
   ggplot($df,aes_string(x=$(string(x)),y=$(string(y)))) +
       geom_raster(aes(fill=value)) +
       facet_grid(as.formula(paste($(string(w)), "~",
@@ -63,7 +63,7 @@ end
 
 function ggplot_axes_(df,axes,x,y,z,w,v;args)
   R"""
-  require(ggplot2)
+  library(ggplot2)
   ggplot($df,aes_string(x=$(string(x)),y=$(string(y)))) +
       geom_raster(aes(fill=value)) +
       facet_grid(as.formula(paste($(string(w)), "~",
@@ -73,7 +73,7 @@ end
 
 function ggplot_axes_(df,axes,x,y,z,w,v,u;args)
   R"""
-  require(ggplot2)
+  library(ggplot2)
   ggplot($df,aes_string(x=$(string(x)),y=$(string(y)))) +
       geom_raster(aes(fill=value)) +
       facet_grid(as.formula(paste($(string(w)), "+", $(string(u)), "~",
