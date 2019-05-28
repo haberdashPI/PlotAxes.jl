@@ -23,4 +23,4 @@ RCall = "6f49c342-dc21-5d91-9882-a32aef131414"
 Conda = "8f4d0f93-b110-5947-807f-2305c1781a2d"
 
 [targets]
-test = ["Test"]
+test = ["Test", "Gadfly", "VegaLite", "RCall", "Conda"]
