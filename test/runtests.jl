@@ -35,7 +35,9 @@ using Pkg
 end
 
 ENV["R_HOME"]="*"
-pkg"add Gadfly VegaLite RCall"
+pkg"add Gadfly VegaLite RCall Conda"
+using Conda
+Conda.add("ggplot2","r")
 
 @testset "Can use backends" begin
   data = AxisArray(rand(10,10,2,2),:a,:b,:c,:d)
@@ -49,7 +51,6 @@ pkg"add Gadfly VegaLite RCall"
   @test PlotAxes.current_backend[] == :vegalite
 
   using RCall
-  reval("install.packages('ggplot2',repos='https://cran.r-project.org')")
   plotaxes(data)
   @test PlotAxes.current_backend[] == :ggplot2
 
