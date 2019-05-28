@@ -1,5 +1,8 @@
 # PlotAxes
 
+[![Build Status](https://travis-ci.org/haberdashPI/PlotAxes.jl.svg?branch=master)](https://travis-ci.org/haberdashPI/PlotAxes.jl)
+[![Build status](https://ci.appveyor.com/api/projects/status/52duehasqjvedj0x/branch/master?svg=true)](https://ci.appveyor.com/project/haberdashPI/plotaxes-jl/branch/master)
+
 PlotAxes is intended to simplify the visualization of medium dimensional data
 (e.g. 4-5 dimensions max) during an interactive session. It is *not*
 intended as a full fledged plotting API for publication quality graphs.
