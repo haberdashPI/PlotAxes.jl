@@ -32,7 +32,8 @@ This is working for display of data in my day-to-day work. It has a fairly
 minimal number of features, as it intended for my initial, rapid plotting,
 and I employ a specific backend for more detailed, publication quality
 figures. There are plenty of features that might be added or backends that
-could be implemented.
+could be implemented. In the long-term I would like to make the `plotaxes`
+command easily composable with the other features of each backend.
 
 Tests current fail on Windows due to 
 [this issue](https://github.com/JuliaInterop/RCall.jl/issues/269): 
