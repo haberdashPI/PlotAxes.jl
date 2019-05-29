@@ -57,10 +57,13 @@ function plotaxes(args...;kwds...)
 end
 
 """
-    set_backend(symbol)
+    set_backend!(symbol)
 
 Set the backend used to display plots when calling `plotaxes`. Call
 `list_backends()` for a list of available backends.
+
+Note that, when a package with a backend is loaded (e.g. `using Gadfly`) this
+method will be called automatically for the new backend.
 """
 set_backend!(x::Symbol) = current_backend[] = x
 
@@ -68,8 +71,8 @@ set_backend!(x::Symbol) = current_backend[] = x
     list_backends()
 
 List all currently available backends for plotting with `plotaxes`. This will
-be populated as packages that are supported by `PlotAxes` are loaded (e.g.
-via `using`)
+be populated with available backends as packages that are supported by
+`PlotAxes` are loaded (e.g. via `using`)
 
 # Supported backends
 
