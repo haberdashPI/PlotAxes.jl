@@ -120,7 +120,7 @@ function quantize(x,steps)
   n = fill(0,qsize)
 
   for I in CartesianIndices(x)
-    values[bin(I,steps)] += x[I]
+    values[bin(I,steps)] += cleanup(x[I])
     n[bin(I,steps)] += 1
   end
   values ./= n
