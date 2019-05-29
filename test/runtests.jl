@@ -31,9 +31,13 @@ using Unitful
   df, = PlotAxes.asplotable(data)
   @test size(df,1) == length(data)
 
+  data = AxisArray(rand(10),Axis{:time}(DateTime(1961,1,1):Day(1):DateTime(1961,1,10)))
+  df, = PlotAxes.asplotable(data,quantize=(5,))
+  @test size(df,1) == 5
+
   data = AxisArray(rand(10),Axis{:time}(range(0u"s",1u"s",length=10)))
   df, = PlotAxes.asplotable(data,quantize=(5,))
-  @test size(df,1) == length(data)
+  @test size(df,1) == 5
 
   df, = PlotAxes.asplotable(rand(10,10),quantize=(5,5))
   @test size(df,1) == 25
