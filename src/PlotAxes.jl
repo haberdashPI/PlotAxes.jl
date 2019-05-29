@@ -155,6 +155,9 @@ function asplotable(x::AxisArray,ax1,axes...;
   df = DataFrame(value = vec(vals))
   for ax in show_axes
     axi = findfirst(isequal(ax),axisnames(x))
+    if isnothing(axi)
+      error("Could not find the axis $ax.")
+    end
     df[:,ax] = default_value(eltype(axqvals[axi]))
     for (j,jj) in enumerate(CartesianIndices(vals))
       df[j,ax] = cleanup(axqvals[axi][jj.I[axi]])
