@@ -16,11 +16,12 @@ Requires = "≥ 0.5"
 julia = "0.7,1"
 
 [extras]
-Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
-Gadfly = "c91e804a-d5a3-530f-b6f0-dfbca275c004"
-VegaLite = "112f6efa-9a02-5b7d-90c0-432ed331239a"
-RCall = "6f49c342-dc21-5d91-9882-a32aef131414"
 Conda = "8f4d0f93-b110-5947-807f-2305c1781a2d"
+Gadfly = "c91e804a-d5a3-530f-b6f0-dfbca275c004"
+RCall = "6f49c342-dc21-5d91-9882-a32aef131414"
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+Unitful = "1986cc42-f94f-5a68-af5c-568840ba703d"
+VegaLite = "112f6efa-9a02-5b7d-90c0-432ed331239a"
 
 [targets]
-test = ["Test", "Gadfly", "VegaLite", "RCall", "Conda"]
+test = ["Test", "Gadfly", "VegaLite", "RCall", "Conda", "Unitful"]

@@ -3,6 +3,7 @@ using PlotAxes
 using Dates
 using AxisArrays
 using Pkg
+using Unitful
 
 @testset "Can generate plotable data" begin
   data = AxisArray(rand(10,10,2,2),:a,:b,:c,:d)
@@ -27,6 +28,10 @@ using Pkg
   @test size(df,1) == length(data)
 
   data = AxisArray(rand(10),Axis{:time}(DateTime(1961,1,1):Day(1):DateTime(1961,1,10)))
+  df, = PlotAxes.asplotable(data)
+  @test size(df,1) == length(data)
+
+  data = AxisArray(rand(10),Axis{:time}(range(0u"s",1u"s",length=10)))
   df, = PlotAxes.asplotable(data)
   @test size(df,1) == length(data)
 

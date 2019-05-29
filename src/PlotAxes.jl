@@ -176,6 +176,7 @@ function __init__()
   @require Unitful="1986cc42-f94f-5a68-af5c-568840ba703d" begin
     using .Unitful
     cleanup(x::Quantity) = ustrip(x)
+    default_value(::Type{<:Quantity{T}}) where T = default_value(T)
   end
   @require VegaLite="112f6efa-9a02-5b7d-90c0-432ed331239a" begin
     using .VegaLite
