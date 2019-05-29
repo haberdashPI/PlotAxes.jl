@@ -28,5 +28,14 @@ For more details, see the documentation for `plotaxes` (ala ? at the REPL).
 
 ## Status
 
-This is working for display of data in my day-to-day work. There are plenty
-of features that might be added or backends that could be implemented.
+This is working for display of data in my day-to-day work. It has a fairly
+minimal number of features, as it intended for my initial, rapid plotting,
+and I employ a specific backend for more detailed, publication quality
+figures. There are plenty of features that might be added or backends that
+could be implemented.
+
+Tests current fail on Windows due to 
+[this issue](https://github.com/JuliaInterop/RCall.jl/issues/269): 
+that will only affect you if you want to use the RCall backend, *and* when
+you attempt to install R via the julia Conda.jl package (this approach to
+installing R doesn't seem to be working right now).
