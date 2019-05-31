@@ -88,20 +88,10 @@ end
     AxisArray(rand(10),:a)
   ]
   for d in alldata
-    for b in [:vegalite,:gadfly]
+    for b in PlotAxes.list_backends()
       PlotAxes.set_backend!(b)
       result = plotaxes(d)
       @test result != false
-    end
-  end
-
-  @handle_RCall_failure begin
-    using RCall
-    for d in alldata
-      b = :ggplot2
-        PlotAxes.set_backend!(b)
-        result = plotaxes(d)
-        @test result != false
     end
   end
 end
