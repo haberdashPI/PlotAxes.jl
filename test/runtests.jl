@@ -10,7 +10,8 @@ macro handle_RCall_failure(body)
     try
       $(esc(body))
     catch e
-      if e isa LoadError && Sys.iswindows()
+      if e isa ErrorException && Sys.iswindows() &&
+        startswith(e.msg,"Failed to precompile RCall ")
         @warn "Failed to install RCall; currently fails on Windows when you use"*
         " Conda to install R. You can fix this by manually installing and "*
         "downloading R and then typing ]build RCall at the julia REPL."

@@ -34,9 +34,3 @@ and I employ a specific backend for more detailed, publication quality
 figures. There are plenty of features that might be added or backends that
 could be implemented. In the long-term I would like to make the `plotaxes`
 command easily composable with the other features of each backend.
-
-Tests current fail on Windows due to 
-[this issue](https://github.com/JuliaInterop/RCall.jl/issues/269): 
-that will only affect you if you want to use the RCall backend, *and* when
-you attempt to install R via the julia Conda.jl package (this approach to
-installing R doesn't seem to be working right now).
