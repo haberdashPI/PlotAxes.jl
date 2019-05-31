@@ -5,6 +5,22 @@ using AxisArrays
 using Pkg
 using Unitful
 
+macro handle_RCall_failure(body)
+  quote
+    try
+      $(esc(body))
+    catch e
+      if e isa LoadError && Sys.iswindows()
+        @warn "Failed to install RCall; currently fails on Windows when you use"*
+        " Conda to install R. You can fix this by manually installing and "*
+        "downloading R and then typing ]build RCall at the julia REPL."
+      else
+        rethrow(e)
+      end
+    end
+  end
+end
+
 @testset "Can generate plotable data" begin
   data = AxisArray(rand(10,10,2,2),:a,:b,:c,:d)
   df, = PlotAxes.asplotable(data)
@@ -54,9 +70,11 @@ end
   plotaxes(data)
   @test PlotAxes.current_backend[] == :vegalite
 
-  using RCall
-  plotaxes(data)
-  @test PlotAxes.current_backend[] == :ggplot2
+  @handle_RCall_failure begin
+    using RCall
+    plotaxes(data)
+    @test PlotAxes.current_backend[] == :ggplot2
+  end
 
   alldata = [
     AxisArray(rand(10,10,2),:a,:b,:c),
@@ -64,7 +82,13 @@ end
     AxisArray(rand(10),:a)
   ]
   for d in alldata
-    for b in [:ggplot2,:vegalite,:gadfly]
+    for b in [:vegalite,:gadfly]
+      PlotAxes.set_backend!(b)
+      result = plotaxes(d)
+      @test result != false
+    end
+    b = :ggplot2
+    @handle_RCall_failure begin
       PlotAxes.set_backend!(b)
       result = plotaxes(d)
       @test result != false
