@@ -3,6 +3,7 @@ using AxisArrays
 using DataFrames
 using Requires
 using Dates
+using Compat
 
 export asplotable, plotaxes
 
