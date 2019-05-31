@@ -66,6 +66,8 @@ end
 @testset "Can use backends" begin
   data = AxisArray(rand(10,10,2,2),:a,:b,:c,:d)
 
+  @test_throws ErrorException PlotAxes.set_backend!(:impossible_bob)
+
   using Gadfly
   plotaxes(data)
   @test PlotAxes.current_backend[] == :gadfly

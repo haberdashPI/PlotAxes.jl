@@ -66,7 +66,14 @@ Set the backend used to display plots when calling `plotaxes`. Call
 Note that, when a package with a backend is loaded (e.g. `using Gadfly`) this
 method will be called automatically for the new backend.
 """
-set_backend!(x::Symbol) = current_backend[] = x
+function set_backend!(x::Symbol)
+  if x ∉ list_backends()
+    error("The symbol `$x` is not an available backend. "*
+      "Select from one of $(list_backends()).")
+  else
+    current_backend[] = x
+  end
+end
 
 """
     list_backends()
