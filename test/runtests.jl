@@ -12,15 +12,18 @@ macro handle_RCall_failure(body)
     catch e
       if e isa ErrorException && Sys.iswindows() &&
         startswith(e.msg,"Failed to precompile RCall ")
-        @warn "Failed to install RCall; currently fails on Windows when you use"*
-        " Conda to install R. You can fix this by manually installing and "*
-        "downloading R and then typing ]build RCall at the julia REPL."
+        @warn "Failed to properly install RCall; currently fails on Windows "*
+        "when you use Conda to install R. You can fix this by manually "*
+        "installing and downloading R and then typing ]build RCall at the "*
+        "julia REPL."
       else
         rethrow(e)
       end
     end
   end
 end
+
+@testset "PlotAxes" begin
 
 @testset "Can generate plotable data" begin
   data = AxisArray(rand(10,10,2,2),:a,:b,:c,:d)
@@ -88,11 +91,17 @@ end
       result = plotaxes(d)
       @test result != false
     end
-    b = :ggplot2
-    @handle_RCall_failure begin
-      PlotAxes.set_backend!(b)
-      result = plotaxes(d)
-      @test result != false
+  end
+
+  @handle_RCall_failure begin
+    using RCall
+    for d in alldata
+      b = :ggplot2
+        PlotAxes.set_backend!(b)
+        result = plotaxes(d)
+        @test result != false
     end
   end
+end
+
 end
