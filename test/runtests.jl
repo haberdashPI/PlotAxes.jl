@@ -54,6 +54,13 @@ end
   @test :log_b in names(df)
   @test sort(unique(df.log_b)) ≈ range(0,1,length=10)
 
+  data = AxisArray(rand(10,10),Axis{:a}(exp.(range(0,1,length=10))),
+    Axis{:b}(range(0,1,length=10)))
+  df, = PlotAxes.asplotable(data,:a => log,:b)
+  @test size(df,1) == length(data)
+  @test :log_a in names(df)
+  @test sort(unique(df.log_a)) ≈ range(0,1,length=10)
+
   @test_throws(ErrorException("Could not find the axis c."),
     PlotAxes.asplotable(data,:c))
 

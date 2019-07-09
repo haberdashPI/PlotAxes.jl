@@ -170,19 +170,19 @@ axarg_name(x) =
   throw(ArgumentError("Unexpected argument. Must be a Symbol or Pair."))
 
 # apply any specified transform to the axes
-function transform_axes(xs,axnames)
-  allnames = axisnames(xs)
-  axnames = collect(axnames)
-  shownax = indexin(allnames,axarg_name.(axnames))
-  if any(isnothing,shownax)
-    ax = axarg_name(axnames[findfirst(isnothing,shownax)])
+function transform_axes(xs,showax)
+  allax = collect(Any,axisnames(xs))
+  showax = collect(showax)
+  showax_i = indexin(axarg_name.(showax),allax)
+  if any(isnothing,showax_i)
+    ax = axarg_name(showax[findfirst(isnothing,showax_i)])
     error("Could not find the axis $ax.")
   end
-  axnames[shownax] = axnames
-  axs = map(ax -> transform_axis(xs,ax),axnames)
+  allax[showax_i] = showax
+  axs = map(ax -> transform_axis(xs,ax),allax)
 
   result = AxisArray(xs.data,axs...)
-  result, axisnames(result)[shownax]
+  result, axisnames(result)[showax_i]
 end
 
 transform_axis(xs,name::Symbol) = AxisArrays.axes(xs,Axis{name})
