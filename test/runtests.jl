@@ -47,6 +47,19 @@ end
   df, = PlotAxes.asplotable(data)
   @test size(df,1) == length(data)
 
+  data = AxisArray(rand(10,10),Axis{:a}(range(0,1,length=10)),
+    Axis{:b}(exp.(range(0,1,length=10))))
+  df, = PlotAxes.asplotable(data,:a,:b => log)
+  @test size(df,1) == length(data)
+  @test :log_b in names(df)
+  @test sort(unique(df.log_b)) ≈ range(0,1,length=10)
+
+  @test_throws(ErrorException("Could not find the axis c."),
+    PlotAxes.asplotable(data,:c))
+
+  @test_throws(ArgumentError("Unexpected argument. Must be a Symbol or Pair."),
+    PlotAxes.asplotable(data,:a,df))
+
   data = AxisArray(rand(10),Axis{:time}(DateTime(1961,1,1):Day(1):DateTime(1961,1,10)))
   df, = PlotAxes.asplotable(data)
   @test size(df,1) == length(data)
