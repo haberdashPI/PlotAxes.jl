@@ -120,11 +120,12 @@ bin(i,step) = floor(Int,(i-1)/step)+1
 bin(ii::CartesianIndex,steps) = CartesianIndex(bin.(ii.I,steps))
 # unbin(i,step) = (i-1)*step + 1, i*step
 
-cleanup(x) = x
-cleanup(x::Symbol) = string(x)
-default_value(::Type{T}) where T = zero(float(T))
+cleanup(x::Number) = x
+cleanup(x::TimeType) = x
+cleanup(x) = string(x)
+default_value(::Type{T}) where T <: Number = zero(float(T))
 default_value(::Type{T}) where T <: TimeType = T(0)
-default_value(::Type{T}) where T <: Union{Symbol,String} = ""
+default_value(::Type) = ""
 
 function quantize(x::AbstractRange{<:DateTime},steps::Number)
   step = steps[1]
@@ -141,6 +142,10 @@ function quantize(x,steps)
   if all(qsize .>= size(x))
     return x
   end
+  if default_value(eltype(x)) isa String
+    error("Cannot quantize non-numeric value of type $(eltype(x)).")
+  end
+
   values = fill(default_value(eltype(x)),qsize)
   # TODO: computation of n could be optimized
   # we're taking a "dumb" approach that is easy to understand but inefficient

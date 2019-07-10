@@ -75,6 +75,12 @@ end
   df, = PlotAxes.asplotable(data,quantize=(5,))
   @test size(df,1) == 5
 
+  data = AxisArray(rand(4),Axis{:tuple}([(1,2),(1,3),(2,5),(2,6)]))
+  df, = PlotAxes.asplotable(data,quantize=(5,))
+  msg = "Cannot quantize non-numeric value of type Tuple{Int64,Int64}."
+  @test size(df,1) == 4
+  @test_throws(ErrorException(msg), PlotAxes.asplotable(data,quantize=(3,)))
+
   data = AxisArray(rand(10),Axis{:time}(range(0u"s",1u"s",length=10)))
   df, = PlotAxes.asplotable(data,quantize=(5,))
   @test size(df,1) == 5
