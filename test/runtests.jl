@@ -113,6 +113,15 @@ end
       result = plotaxes(d)
       @test result != false
     end
+    if ndims(d) == 3
+      result = plotaxes(d,:a,:b => log,:c)
+    elseif ndims(d) == 2
+      result = plotaxes(d,:a,:b => log)
+    elseif ndims(d) == 1
+      result = plotaxes(d,:a => log)
+    end
+
+    @test result != false
   end
 end
 

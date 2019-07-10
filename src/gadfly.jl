@@ -1,13 +1,13 @@
 export gadplot_axes
 
 split_gadargs(args...) = (),args
-split_gadargs(ax::Symbol,args...) = (ax,),args
-split_gadargs(ax1::Symbol,ax2::Symbol,args...) = (ax1,ax2),args
-split_gadargs(ax1::Symbol,ax2::Symbol,ax3::Symbol,args...) = (ax1,ax2,ax3),args
-split_gadargs(ax1::Symbol,ax2::Symbol,ax3::Symbol,ax4::Symbol,args...) =
+split_gadargs(ax::AxisId,args...) = (ax,),args
+split_gadargs(ax1::AxisId,ax2::AxisId,args...) = (ax1,ax2),args
+split_gadargs(ax1::AxisId,ax2::AxisId,ax3::AxisId,args...) = (ax1,ax2,ax3),args
+split_gadargs(ax1::AxisId,ax2::AxisId,ax3::AxisId,ax4::AxisId,args...) =
   (ax1,ax2,ax3,ax4),args
-function split_gadargs(ax1::Symbol,ax2::Symbol,ax3::Symbol,ax4::Symbol,
-                      ax5::Symbol,args...)
+function split_gadargs(ax1::AxisId,ax2::AxisId,ax3::AxisId,ax4::AxisId,
+                      ax5::AxisId,args...)
   error("Plotting data using 5 or more axes is not supported by Gadfly backend.")
 end
 

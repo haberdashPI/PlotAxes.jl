@@ -1,17 +1,17 @@
 export ggplot_axes
 
 split_ggargs(args...) = (),args
-split_ggargs(ax::Symbol,args...) = (ax,),args
-split_ggargs(ax1::Symbol,ax2::Symbol,args...) = (ax1,ax2),args
-split_ggargs(ax1::Symbol,ax2::Symbol,ax3::Symbol,args...) = (ax1,ax2,ax3),args
-split_ggargs(ax1::Symbol,ax2::Symbol,ax3::Symbol,ax4::Symbol,args...) =
+split_ggargs(ax::AxisId,args...) = (ax,),args
+split_ggargs(ax1::AxisId,ax2::AxisId,args...) = (ax1,ax2),args
+split_ggargs(ax1::AxisId,ax2::AxisId,ax3::AxisId,args...) = (ax1,ax2,ax3),args
+split_ggargs(ax1::AxisId,ax2::AxisId,ax3::AxisId,ax4::AxisId,args...) =
   (ax1,ax2,ax3,ax4),args
-split_ggargs(ax1::Symbol,ax2::Symbol,ax3::Symbol,ax4::Symbol,ax5::Symbol,args...) =
+split_ggargs(ax1::AxisId,ax2::AxisId,ax3::AxisId,ax4::AxisId,ax5::AxisId,args...) =
   (ax1,ax2,ax3,ax4,ax5),args
-split_ggargs(ax1::Symbol,ax2::Symbol,ax3::Symbol,ax4::Symbol,ax5::Symbol,
-  ax6::Symbol,args...) = (ax1,ax2,ax3,ax4,ax5,ax6),args
-function split_ggargs(ax1::Symbol,ax2::Symbol,ax3::Symbol,ax4::Symbol,
-                      ax5::Symbol,ax6::Symbol,ax7::Symbol,args...)
+split_ggargs(ax1::AxisId,ax2::AxisId,ax3::AxisId,ax4::AxisId,ax5::AxisId,
+  ax6::AxisId,args...) = (ax1,ax2,ax3,ax4,ax5,ax6),args
+function split_ggargs(ax1::AxisId,ax2::AxisId,ax3::AxisId,ax4::AxisId,
+                      ax5::AxisId,ax6::AxisId,ax7::AxisId,args...)
   error("Plotting data using 7 or more axes is not supported by ggplot backend.")
 end
 

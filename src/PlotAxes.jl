@@ -239,6 +239,8 @@ end
 # using Gadfly
 # include("gadfly.jl")
 
+const AxisId = Union{Symbol,Pair}
+
 function __init__()
   @require RCall="6f49c342-dc21-5d91-9882-a32aef131414" begin
     using .RCall
