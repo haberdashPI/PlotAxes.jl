@@ -27,15 +27,15 @@ function gadplot_axes_(df,axes,x;args)
 end
 
 function gadplot_axes_(df,axes,x,y;args)
-  (xmin,xmax) = extrema(df[x])
-  (ymin,ymax) = extrema(df[y])
+  (xmin,xmax) = extrema(df[!,x])
+  (ymin,ymax) = extrema(df[!,y])
   plot(df,x=x,y=y,color=:value,Geom.rectbin,
        Coord.cartesian(xmin=xmin,xmax=xmax),args...)
 end
 
 function gadplot_axes_(df,axes,x,y,z;args)
-  xmin,xmax = extrema(df[x])
-  ymin,ymax = extrema(df[y])
+  xmin,xmax = extrema(df[!,x])
+  ymin,ymax = extrema(df[!,y])
   plot(df,x=x,y=y,color=:value,xgroup=z,
        Geom.subplot_grid(Geom.rectbin,
                          Coord.cartesian(xmin=xmin,xmax=xmax,
@@ -43,8 +43,8 @@ function gadplot_axes_(df,axes,x,y,z;args)
 end
 
 function gadplot_axes_(df,axes,x,y,z,w;args)
-  xmin,xmax = extrema(df[x])
-  ymin,ymax = extrema(df[y])
+  xmin,xmax = extrema(df[!,x])
+  ymin,ymax = extrema(df[!,y])
   plot(df,x=x,y=y,color=:value,xgroup=z,ygroup=w,
        Geom.subplot_grid(Geom.rectbin,
                          Coord.cartesian(xmin=xmin,xmax=xmax,
