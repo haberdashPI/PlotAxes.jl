@@ -89,45 +89,51 @@ end
   @test size(df,1) == 25
 end
 
+allowed_dimensions = Dict(:ggplot2 => 6,:vegalite => 4,:gadfly => 4)
 @testset "Can use backends" begin
-  data = AxisArray(rand(10,10,2,2),:a,:b,:c,:d)
-
-  @test_throws ErrorException PlotAxes.set_backend!(:impossible_bob)
+  @test_throws ErrorException PlotAxes.set_backend!(:foo)
 
   using Gadfly
-  plotaxes(data)
   @test PlotAxes.current_backend[] == :gadfly
 
   using VegaLite
-  plotaxes(data)
   @test PlotAxes.current_backend[] == :vegalite
 
   @handle_RCall_failure begin
     using RCall
-    plotaxes(data)
     @test PlotAxes.current_backend[] == :ggplot2
   end
 
   alldata = [
-    AxisArray(rand(10,10,2),:a,:b,:c),
+    AxisArray(rand(10),:a),
     AxisArray(rand(10,10),:a,:b),
-    AxisArray(rand(10),:a)
+    AxisArray(rand(10,10,2),:a,:b,:c),
+    AxisArray(rand(10,10,2,2),:a,:b,:c,:d),
+    AxisArray(rand(10,10,2,2,2),:a,:b,:c,:d,:e),
+    AxisArray(rand(10,10,2,2,2,2),:a,:b,:c,:d,:e,:f),
+    AxisArray(rand(10,10,2,2,2,2,2),:a,:b,:c,:d,:e,:f,:h)
   ]
+
   for d in alldata
     for b in PlotAxes.list_backends()
       PlotAxes.set_backend!(b)
-      result = plotaxes(d)
+      if allowed_dimensions[b] >= ndims(d)
+        result = plotaxes(d)
+        @test result != false
+      else
+        @test_throws ErrorException plotaxes(d)
+      end
+
+      result = if ndims(d) == 3
+        plotaxes(d,:a,:b => log,:c)
+      elseif ndims(d) == 2
+        plotaxes(d,:a,:b => log)
+      elseif ndims(d) == 1
+        plotaxes(d,:a => log)
+      end
       @test result != false
     end
-    if ndims(d) == 3
-      result = plotaxes(d,:a,:b => log,:c)
-    elseif ndims(d) == 2
-      result = plotaxes(d,:a,:b => log)
-    elseif ndims(d) == 1
-      result = plotaxes(d,:a => log)
-    end
 
-    @test result != false
   end
 end
 
