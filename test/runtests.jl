@@ -114,24 +114,27 @@ allowed_dimensions = Dict(:ggplot2 => 6,:vegalite => 4,:gadfly => 4)
     AxisArray(rand(10,10,2,2,2,2,2),:a,:b,:c,:d,:e,:f,:h)
   ]
 
-  for d in alldata
-    for b in PlotAxes.list_backends()
-      PlotAxes.set_backend!(b)
-      if allowed_dimensions[b] >= ndims(d)
-        result = plotaxes(d)
-        @test result != false
-      else
-        @test_throws ErrorException plotaxes(d)
-      end
+  for b in PlotAxes.list_backends()
+    for d in alldata
+      title = string("Backend ",b)
+      @testset "$title" begin
+        PlotAxes.set_backend!(b)
+        if allowed_dimensions[b] >= ndims(d)
+          result = plotaxes(d)
+          @test result != false
+        else
+          @test_throws ErrorException plotaxes(d)
+        end
 
-      result = if ndims(d) == 3
-        plotaxes(d,:a,:b => log,:c)
-      elseif ndims(d) == 2
-        plotaxes(d,:a,:b => log)
-      elseif ndims(d) == 1
-        plotaxes(d,:a => log)
+        result = if ndims(d) == 3
+          plotaxes(d,:a,:b => log,:c)
+        elseif ndims(d) == 2
+          plotaxes(d,:a,:b => log)
+        elseif ndims(d) == 1
+          plotaxes(d,:a => log)
+        end
+        @test result != false
       end
-      @test result != false
     end
 
   end
