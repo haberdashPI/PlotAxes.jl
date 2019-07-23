@@ -228,7 +228,7 @@ function asplotable(x::AxisArray,ax1,axes...;
   vals = PlotAxes.quantize(x,steps)
   axqvals = PlotAxes.quantize.(axisvalues(x),steps)
 
-  df = DataFrame(value = vec(vals))
+  df = DataFrame(value = convert(Array{eltype(vals)},vec(vals)))
   for ax in show_axes
     axi = findfirst(isequal(axarg_name(ax)),axisnames(x))
     df[!,ax] .= default_value(eltype(axqvals[axi]))

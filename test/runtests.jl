@@ -84,6 +84,11 @@ end
   data = AxisArray(rand(10),Axis{:time}(range(0u"s",1u"s",length=10)))
   df, = PlotAxes.asplotable(data,quantize=(5,))
   @test size(df,1) == 5
+  @test df.time isa Array
+
+  df, = PlotAxes.asplotable(data,quantize=(20,))
+  @test size(df,1) == length(data)
+  @test df.time isa Array
 
   df, = PlotAxes.asplotable(rand(10,10),quantize=(5,5))
   @test size(df,1) == 25
