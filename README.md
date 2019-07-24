@@ -1,5 +1,6 @@
 # PlotAxes
 
+[![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 [![Build Status](https://travis-ci.org/haberdashPI/PlotAxes.jl.svg?branch=master)](https://travis-ci.org/haberdashPI/PlotAxes.jl)
 [![Build status](https://ci.appveyor.com/api/projects/status/52duehasqjvedj0x/branch/master?svg=true)](https://ci.appveyor.com/project/haberdashPI/plotaxes-jl/branch/master)
 [![codecov](https://codecov.io/gh/haberdashPI/PlotAxes.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/haberdashPI/PlotAxes.jl)
