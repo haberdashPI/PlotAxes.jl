@@ -14,10 +14,10 @@ end
 
 struct QualitativePlotAxis end
 
-PlotAxis(x::Vector{<:Number}) = ContinuousPlotAxis(x[2] - x[1],:linear)
-PlotAxis(x::AbstractRange{<:Number}) = ContinuousPlotAxis(step(x),:linear)
-PlotAxis(x::Vector{<:TimeType}) = ContinuousPlotAxis(x[2] - x[1],:linear)
-PlotAxis(x::AbstractRange{<:TimeType}) = ContinuousPlotAxis(step(x),:linear)
+PlotAxis(x::Vector{<:Number}) = ContinuousPlotAxis(cleanup(x[2] - x[1]),:linear)
+PlotAxis(x::AbstractRange{<:Number}) = ContinuousPlotAxis(cleanup(step(x)),:linear)
+PlotAxis(x::Vector{<:TimeType}) = ContinuousPlotAxis(cleanup(x[2] - x[1]),:linear)
+PlotAxis(x::AbstractRange{<:TimeType}) = ContinuousPlotAxis(cleanup(step(x)),:linear)
 PlotAxis(x) = QualitativePlotAxis()
 
 const current_backend = Ref{Union{Nothing,Symbol}}(nothing)
