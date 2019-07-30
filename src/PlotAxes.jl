@@ -4,8 +4,9 @@ using DataFrames
 using Requires
 using Dates
 using Compat
+using Statistics
 
-export asplotable, plotaxes
+export asplotable, plotaxes, linrange, logrange, rangefn
 
 struct ContinuousPlotAxis{N}
   step::N
@@ -43,7 +44,7 @@ dimension (e.g. ggplot).
 
 ## Display backends
 
-You can change how the plot is displayed using `PlotAxes.set_backend`.
+You can change how the plot is displayed using `PlotAxes.set_backend!`.
 
 ## Axis Transformations
 
@@ -127,7 +128,7 @@ default_value(::Type{T}) where T <: Number = zero(float(T))
 default_value(::Type{T}) where T <: TimeType = T(0)
 default_value(::Type) = ""
 
-function quantize(x::AbstractRange{<:DateTime},steps::Number)
+function quantize(x::AbstractRange{<:TimeType},steps::Number)
   step = steps[1]
   qsize = bin(length(x),step)
   if qsize >= length(x)
@@ -174,6 +175,92 @@ axarg_name((name,fn)::Pair) = name
 axarg_name(x) =
   throw(ArgumentError("Unexpected argument. Must be a Symbol or Pair."))
 
+struct RangeFn{F}
+  fn::F
+  tol::Float64
+end
+(r::RangeFn)(x) = r.fn(x)
+(r::RangeFn)(;tol) = RangeFn(r.fn,tol)
+
+rawnum(x) = x
+rawnum(x::TimePeriod) = Dates.value(x)
+torange(xs) = range(first(xs),last(xs), length=length(xs))
+torange(xs::AbstractArray{<:TimeType}) =
+  range(first(xs),last(xs), step=(last(xs) - first(xs))/(length(xs)-1))
+rangeable(::Type{<:Number}) = true
+rangeable(::Type{<:TimeType}) = true
+rangeable(x) = false
+
+function Base.Broadcast.broadcasted(r::RangeFn{typeof(identity)},
+  vals::AbstractRange)
+
+  vals
+end
+
+function Base.Broadcast.broadcasted(r::RangeFn{typeof(identity)}, vals)
+  if rangeable(eltype(vals))
+    fnvals = cleanup.(vals)
+    std(rawnum.(diff(fnvals))) < r.tol ? torange(fnvals) : fnvals
+  else
+    vals
+  end
+end
+
+function Base.Broadcast.broadcasted(r::RangeFn,vals)
+  fnvals = r.fn.(cleanup.(vals))
+  if rangeable(eltype(fnvals))
+    std(rawnum.(diff(fnvals))) < r.tol ? torange(fnvals) : fnvals
+  else
+    fnvals
+  end
+end
+
+"""
+    rangefn(fn;tol=1e-8)
+
+Transforms `fn` to a ranged function. A ranged function acts just like the
+wrapped, single-arugment function except that when it is broadcast over a
+number of values and those values are very close to evenly spaced, the
+returned values are returned as a Range of exactly evenly spaced values.
+
+# Example
+
+    julia> fn = rangefn(identity,tol=0.1)
+    julia> fn.([1,2,3,4.1,5,6,7,8])
+    1.0:1.0:8.0
+
+# Tolerance
+
+What counts as "very close" can be adjusted using `tol`. If `std(diff(x))` is
+smaller than tol, a `Range` is returned. The tolerance can also be modified
+by passing a single keyword argument to the ranged function. That is, the
+following is true:
+
+    f = rangefn(fn)
+    f(tol=1e-12) == rangefn(fn,tol=1e-12)
+
+"""
+rangefn(x;tol=1e-8) = RangeFn(x,tol)
+
+const logrange = rangefn(log)
+const linrange = rangefn(identity)
+const exact = identity
+
+fn_prefix(x) = ""
+fn_prefix(x::typeof(identity)) = "exact_"
+fn_prefix(x::RangeFn{typeof(identity)}) = ""
+fn_prefix(x::RangeFn) = fn_prefix(x.fn)
+function fn_prefix(x::Function)
+  name = string(Base.typename(typeof(x)))
+  pattern =
+    r"typeof\([-[:alpha:]_\u2207][[:word:]\u207A-\u209C!\u2032\u2207]*\)"
+  if occursin(pattern,name)
+    replace(name,r"typeof\((.*)\)" => s"\1")
+  else
+    ""
+  end
+end
+
 # apply any specified transform to the axes
 function transform_axes(xs,showax)
   allax = collect(Any,axisnames(xs))
@@ -190,27 +277,16 @@ function transform_axes(xs,showax)
   result, axisnames(result)[showax_i]
 end
 
-transform_axis(xs,name::Symbol) = AxisArrays.axes(xs,Axis{name})
+# default to a linear "transformation"
+transform_axis(xs,name::Symbol) = transform_axis(xs,name => linrange)
 function transform_axis(xs,(name,fn)::Pair)
   allvals = axisvalues(xs)
   axisnames(xs)
   n = axisdim(xs,Axis{name})
   vals = fn.(allvals[n])
-  newname = Symbol(string(fn_prefix(fn),"_",name))
+  newname = Symbol(string(fn_prefix(fn),name))
   Axis{newname}(vals)
 end
-
-function fn_prefix(x::Function)
-  name = string(Base.typename(typeof(x)))
-  pattern =
-    r"typeof\([-+[:alpha:]_\u2207][[:word:]\u207A-\u209C!\u2032\u2207]*\)"
-  if occursin(pattern,name)
-    replace(name,r"typeof\((.*)\)" => s"\1")
-  else
-    ""
-  end
-end
-fn_prefix(x) = ""
 
 function asplotable(x::AxisArray,ax1,axes...;
                     quantize=default_quantize(ax1,axes...))

@@ -47,19 +47,22 @@ end
   df, = PlotAxes.asplotable(data)
   @test size(df,1) == length(data)
 
+  @test logrange.(exp.([1,2,3])) isa AbstractRange
+  @test linrange.([1,2,3]) isa AbstractRange
+
   data = AxisArray(rand(10,10),Axis{:a}(range(0,1,length=10)),
     Axis{:b}(exp.(range(0,1,length=10))))
-  df, = PlotAxes.asplotable(data,:a,:b => log)
+  df, = PlotAxes.asplotable(data,:a,:b => logrange)
   @test size(df,1) == length(data)
-  @test :log_b in names(df)
-  @test sort(unique(df.log_b)) ≈ range(0,1,length=10)
+  @test :logb in names(df)
+  @test sort(unique(df.logb)) ≈ range(0,1,length=10)
 
   data = AxisArray(rand(10,10),Axis{:a}(exp.(range(0,1,length=10))),
     Axis{:b}(range(0,1,length=10)))
-  df, = PlotAxes.asplotable(data,:a => log,:b)
+  df, = PlotAxes.asplotable(data,:a => logrange,:b)
   @test size(df,1) == length(data)
-  @test :log_a in names(df)
-  @test sort(unique(df.log_a)) ≈ range(0,1,length=10)
+  @test :loga in names(df)
+  @test sort(unique(df.loga)) ≈ range(0,1,length=10)
 
   @test_throws(ErrorException("Could not find the axis c."),
     PlotAxes.asplotable(data,:c))
@@ -68,6 +71,10 @@ end
     PlotAxes.asplotable(data,:a,df))
 
   data = AxisArray(rand(10),Axis{:time}(DateTime(1961,1,1):Day(1):DateTime(1961,1,10)))
+  df, = PlotAxes.asplotable(data)
+  @test size(df,1) == length(data)
+
+  data = AxisArray(rand(10),Axis{:time}(collect(DateTime(1961,1,1):Day(1):DateTime(1961,1,10))))
   df, = PlotAxes.asplotable(data)
   @test size(df,1) == length(data)
 
@@ -120,9 +127,9 @@ allowed_dimensions = Dict(:ggplot2 => 6,:vegalite => 4,:gadfly => 4)
   ]
 
   for b in PlotAxes.list_backends()
-    for d in alldata
-      title = string("Backend ",b)
-      @testset "$title" begin
+    title = string("Backend ",b)
+    @testset "$title" begin
+      for d in alldata
         PlotAxes.set_backend!(b)
         if allowed_dimensions[b] >= ndims(d)
           result = plotaxes(d)
@@ -132,16 +139,15 @@ allowed_dimensions = Dict(:ggplot2 => 6,:vegalite => 4,:gadfly => 4)
         end
 
         result = if ndims(d) == 3
-          plotaxes(d,:a,:b => log,:c)
+          plotaxes(d,:a,:b => logrange,:c)
         elseif ndims(d) == 2
-          plotaxes(d,:a,:b => log)
+          plotaxes(d,:a,:b => logrange)
         elseif ndims(d) == 1
-          plotaxes(d,:a => log)
+          plotaxes(d,:a => logrange)
         end
         @test result != false
       end
     end
-
   end
 end
 
