@@ -28,7 +28,7 @@ const available_backends = Dict{Symbol,Function}()
     plotaxes(data,[axis1,axis2,etc...];quantize=(100,100,10,10,...))
 
 A rudimentary, quantized display of large arrays of medium dimensionality (up
-to about 6 dimensions, depending on the backend).
+to about 4-6 dimensions, depending on the backend).
 
 ## Plot layout
 
@@ -54,9 +54,9 @@ axes, and using a `name => function`. Example:
     using PlotAxes, VegaLite
     data = AxisArray(rand(10,10),Axis{:a}(range(0,1,length=10)),
         Axis{:b}(exp.(range(0,1,length=10))))
-    df, = PlotAxes.asplotable(data,:a,:b => log)
+    df, = PlotAxes.asplotable(data,:a,:b => logrange)
 
-Will result in a plot with a y axis named `log_b` with axis values ranging
+Will result in a plot with a y axis named `logb` with axis values ranging
 between 0 and 1.
 
 ## Data Quantization
@@ -242,8 +242,30 @@ following is true:
 """
 rangefn(x;tol=1e-8) = RangeFn(x,tol)
 
+"""
+    logrange(x;tol=1e-8)
+
+Log transform of an axis. This is similar to `log`, but will translate
+broadcasted output to a `Range` object when std(diff(xs)) < tol.
+
+# See also
+- `linrange`
+- `rangefn`
+"""
 const logrange = rangefn(log)
+
+"""
+    linrange(x;tol=1e-8)
+
+Linear transform of an axis. This is similar to `identity`, but will translate
+broadcasted output to a `Range` object when std(diff(xs)) < tol.
+
+# See also
+- `logrange`
+- `rangefn`
+"""
 const linrange = rangefn(identity)
+
 const exact = identity
 
 fn_prefix(x) = ""
