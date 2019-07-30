@@ -78,7 +78,7 @@ end
   df, = PlotAxes.asplotable(data)
   @test size(df,1) == length(data)
 
-  data = AxisArray(rand(10),Axis{:time}([DateTime(1961,1,1),DateTime(1961,1,3),DateTime(1961,1,10)]))
+  data = AxisArray(rand(3),Axis{:time}([DateTime(1961,1,1),DateTime(1961,1,3),DateTime(1961,1,10)]))
   df, = PlotAxes.asplotable(data)
   @test size(df,1) == length(data)
 
