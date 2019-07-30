@@ -78,6 +78,10 @@ end
   df, = PlotAxes.asplotable(data)
   @test size(df,1) == length(data)
 
+  data = AxisArray(rand(10),Axis{:time}([DateTime(1961,1,1),DateTime(1961,1,3),DateTime(1961,1,10)]))
+  df, = PlotAxes.asplotable(data)
+  @test size(df,1) == length(data)
+
   data = AxisArray(rand(10),Axis{:time}(DateTime(1961,1,1):Day(1):DateTime(1961,1,10)))
   df, = PlotAxes.asplotable(data,quantize=(5,))
   @test size(df,1) == 5
@@ -104,6 +108,9 @@ end
 allowed_dimensions = Dict(:ggplot2 => 6,:vegalite => 4,:gadfly => 4)
 @testset "Can use backends" begin
   @test_throws ErrorException PlotAxes.set_backend!(:foo)
+
+  msg = "No backend defined for plot axes. Call `PlotAxes.set_backend`"
+  @test_throws ErrorException(msg) plotaxes(rand(10))
 
   using Gadfly
   @test PlotAxes.current_backend[] == :gadfly

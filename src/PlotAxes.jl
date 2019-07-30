@@ -160,16 +160,6 @@ function quantize(x,steps)
   values
 end
 
-axis_hasname(axis::Axis{Name},name) where Name = Name == name
-function axis_forname(axes,name)
-  pos = findfirst(x -> axis_hasname(x,name),axes)
-  if isnothing(pos)
-    error("No axis with name $name")
-  else
-    axes[pos]
-  end
-end
-
 axarg_name(x::Symbol) = x
 axarg_name((name,fn)::Pair) = name
 axarg_name(x) =
