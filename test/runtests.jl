@@ -101,6 +101,11 @@ end
   @test size(df,1) == length(data)
   @test df.time isa Array
 
+  data = AxisArray(rand(10,5),Axis{:time}(range(0u"s",1u"s",length=10)),
+    Axis{:freq}(range(10u"Hz",50u"Hz",length=5)))
+  df, = PlotAxes.asplotable(data)
+  @test size(df,1) == length(data)
+
   df, = PlotAxes.asplotable(rand(10,10),quantize=(5,5))
   @test size(df,1) == 25
 end
