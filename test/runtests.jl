@@ -2,7 +2,6 @@ using Test
 using PlotAxes
 using Dates
 using AxisArrays
-using Pkg
 using Unitful
 
 macro handle_RCall_failure(body)
