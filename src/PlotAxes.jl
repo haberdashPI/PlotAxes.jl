@@ -3,7 +3,6 @@ using AxisArrays
 using DataFrames
 using Requires
 using Dates
-using Compat
 using Statistics
 
 export asplotable, plotaxes, linrange, logrange, rangefn
