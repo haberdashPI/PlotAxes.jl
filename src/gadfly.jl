@@ -22,6 +22,9 @@ function gadplot_axes(data,args...;kwds...)
   gadplot_axes_(df,axes,names(df)[2:end]...;args=args)
 end
 
+available_backends[:gadfly] = gadplot_axes
+set_backend!(:gadfly)
+
 function gadplot_axes_(df,axes,x;args)
   plot(df,x=x,y=:value,Geom.line,args...)
 end

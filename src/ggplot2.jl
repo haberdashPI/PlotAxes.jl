@@ -26,6 +26,9 @@ function ggplot_axes(data,args...;kwds...)
   ggplot_axes_(df,axes,names(df)[2:end]...;args=args)
 end
 
+available_backends[:ggplot2] = ggplot_axes
+set_backend!(:ggplot2)
+
 function ggplot_axes_(df,axes,x;args)
   R"""
   library(ggplot2)

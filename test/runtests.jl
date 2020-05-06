@@ -28,11 +28,11 @@ end
   data = AxisArray(rand(10,10,2,2),:a,:b,:c,:d)
   df, = PlotAxes.asplotable(data)
   @test size(df,1) == length(data)
-  @test :a ∈ names(df)
-  @test :b ∈ names(df)
-  @test :c ∈ names(df)
-  @test :d ∈ names(df)
-  @test :value ∈ names(df)
+  @test :a ∈ propertynames(df)
+  @test :b ∈ propertynames(df)
+  @test :c ∈ propertynames(df)
+  @test :d ∈ propertynames(df)
+  @test :value ∈ propertynames(df)
 
   data = AxisArray(rand(10,10,2),:a,:b,:c)
   df, = PlotAxes.asplotable(data)
@@ -53,14 +53,14 @@ end
     Axis{:b}(exp.(range(0,1,length=10))))
   df, = PlotAxes.asplotable(data,:a,:b => logrange)
   @test size(df,1) == length(data)
-  @test :logb in names(df)
+  @test :logb in propertynames(df)
   @test sort(unique(df.logb)) ≈ range(0,1,length=10)
 
   data = AxisArray(rand(10,10),Axis{:a}(exp.(range(0,1,length=10))),
     Axis{:b}(range(0,1,length=10)))
   df, = PlotAxes.asplotable(data,:a => logrange,:b)
   @test size(df,1) == length(data)
-  @test :loga in names(df)
+  @test :loga in propertynames(df)
   @test sort(unique(df.loga)) ≈ range(0,1,length=10)
 
   @test_throws(ErrorException("Could not find the axis c."),

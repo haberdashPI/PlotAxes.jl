@@ -18,6 +18,9 @@ function vlplot_axes(data,args...;colors="reds",width=300,height=300,kwds...)
                width=width,height=height)
 end
 
+available_backends[:vegalite] = vlplot_axes
+set_backend!(:vegalite)
+
 function vlplot_axes_(df,axes,x;colors,width,height)
   df |>
     @vlplot(:line, width=width, height=height,
