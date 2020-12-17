@@ -35,3 +35,6 @@ and I employ a specific backend for more detailed, publication quality
 figures. There are plenty of features that might be added or backends that
 could be implemented. In the long-term I would like to make the `plotaxes`
 command easily composable with the other features of each backend.
+
+This project may not work well on newer versions of Julia, and I myself now use a different
+approach to plotting my data.
